@@ -5,6 +5,7 @@ coverage
 .nitro
 .cache
 .output
+.env.production
 .env
 dist
 .DS_Store
