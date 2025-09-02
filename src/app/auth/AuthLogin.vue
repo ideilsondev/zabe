@@ -21,11 +21,12 @@
           <Button label="Entrar" @click="login" :loading="loading"
             class="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors" />
           <Button label="Entrar com Google" icon="pi pi-google" @click="loginWithGoogle" :loading="loading"
+            severity="danger"
             class="w-full p-3 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-900 dark:text-surface-50 rounded-lg font-medium transition-colors"
-            outlined />
+            outlined disabled />
           <div class="flex justify-between text-sm">
-            <router-link to="/reset-password" class="text-green-500 hover:underline">Esqueceu a senha?</router-link>
-            <router-link to="/register" class="text-green-500 hover:underline">Criar conta</router-link>
+            <router-link to="/reset-password" class="text-blue-500 hover:underline">Esqueceu a senha?</router-link>
+            <router-link to="/register" class="text-blue-500 hover:underline">Criar conta</router-link>
           </div>
         </div>
       </template>
@@ -35,67 +36,59 @@
 </template>
 
 <script setup>
-  import { useAuth } from '@/app/services/useSupabase';
   // import { useAuthStore } from '@/stores/auth';
-  import Button from 'primevue/button';
-  import Card from 'primevue/card';
-  import InputText from 'primevue/inputtext';
   import Toast from 'primevue/toast';
   import { useToast } from 'primevue/usetoast';
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useAuthStore } from '../stores/auth';
 
+
+  const { signIn, auth, initializeAuth } = useAuthStore();
+  // const { auth } = storeToRefs(useAuthStores());
   const email = ref('');
   const password = ref('');
   const loading = ref(false);
   const router = useRouter();
   const toast = useToast();
-  const { signIn, signInWithOAuth, isAuthenticated } = useAuth();
-  // const authStore = useAuthStore();
 
   // Helper function to show Toast messages
-  function showToast(severity, summary, detail, life = 3000) {
+  function showToast({ summary, detail, severity, life = 3000 }) {
     toast.add({ severity, summary, detail, life });
   }
 
   onMounted(async () => {
-    // try {
-    //   await authStore.setUser();
-    //   if (authStore.user) {
-    //     showToast('success', 'Bem-vindo!', 'Você já está logado.', 2000);
-    //     router.push('/profile');
-    //   }
-    // } catch (err) {
-    //   showToast('error', 'Erro', 'Falha ao verificar sessão. Tente novamente.', 4000);
-    // }
+    await initializeAuth();
+    if (auth.isAuthenticated) {
+      router.push({ name: 'dashboard' })
+    }
   });
 
   async function login() {
     if (!email.value || !password.value) {
-      showToast('warn', 'Campos obrigatórios', 'Por favor, preencha email e senha.');
+      showToast({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Por favor, preencha email e senha.' });
       return;
     }
 
     loading.value = true;
     try {
-      const { error: authError } = await signIn({ email: email.value, password: password.value });
-      if (authError) {
-        let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
-        if (authError.message.includes('Invalid login credentials')) {
-          errorMessage = 'Email ou senha incorretos.';
-        } else if (authError.message.includes('network') || authError.message.includes('Failed to fetch')) {
-          errorMessage = 'Sistema offline. Verifique sua conexão.';
-        } else if (authError.status === 503) {
-          errorMessage = 'Servidor em manutenção. Tente novamente mais tarde.';
-        }
-        showToast('error', 'Erro', errorMessage, 4000);
-      } else {
-        // await authStore.setUser();
-        showToast('success', 'Sucesso', 'Login realizado com sucesso!', 2000);
-        router.push('/profile');
-      }
-    } catch (err) {
-      showToast('error', 'Erro', 'Falha inesperada ao fazer login. Tente novamente.', 4000);
+      const res = await signIn({ email: email.value, password: password.value });
+      console.log(res);
+
+      // if (error?.code === 'invalid_credentials') {
+      //   return showToast({ severity: 'error', summary: 'Dados de acesso inválidos', detail: `Dados de acesso inválidos, verifique se o ${email.value} e sua senha estão corretos e tente novamente, se caso o erro persistir entre em contato com nossa equite de suporte` })
+      // }
+
+      // if (user?.role === 'authenticated') {
+      //   // router.push({ name: 'dashboard' });
+      //   console.log('tela dash');
+
+      // }
+
+    } catch (error) {
+      console.log(error);
+
+      showToast({ summary: 'Servidor Indisponível', detail: `O servidor não está disponível no momento. Verifique sua conexão com a internet e tente novamente.`, severity: 'error', life: 10000 })
     } finally {
       loading.value = false;
     }

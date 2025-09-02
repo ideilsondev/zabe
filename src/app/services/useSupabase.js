@@ -49,32 +49,11 @@ export function useAuth() {
   })
 
   const signOut = async () => {
-    try {
-      loading.value = true
-      error.value = null
-      const { error: signOutError } = await supabase.auth.signInWithPassword()
-      if (signOutError) throw signOutError
-    } catch (err) {
-      error.value = err
-      throw err
-    } finally {
-      loading.value = false
-    }
+    return await supabase.auth.signOut()
   }
 
   const signIn = async (credentials) => {
-    try {
-      loading.value = true
-      error.value = null
-      const { data, error: signInError } = await supabase.auth.signInWithPassword(credentials)
-      if (signInError) throw signInError
-      return data
-    } catch (err) {
-      error.value = err
-      throw err
-    } finally {
-      loading.value = false
-    }
+    return await supabase.auth.signInWithPassword(credentials)
   }
 
   // Initialize on first use

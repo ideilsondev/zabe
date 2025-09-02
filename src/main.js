@@ -1,3 +1,4 @@
+import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -11,7 +12,9 @@ import '@/assets/styles.scss';
 import { onChangeTheme } from './app/layout/theme';
 
 const app = createApp(App);
+const pinia = createPinia();
 
+app.use(pinia);
 app.use(router);
 app.use(PrimeVue, {
     theme: {
@@ -23,5 +26,5 @@ app.use(PrimeVue, {
 });
 app.use(ToastService);
 app.use(ConfirmationService);
-onChangeTheme({ primary: 'clarity', surface: 'viva', menuMode: 'overlay', darkTheme: true, preset: 'Material' })
+onChangeTheme({ primary: 'blue', surface: 'viva', menuMode: 'overlay', darkTheme: false, preset: 'Lara' })
 app.mount('#app');

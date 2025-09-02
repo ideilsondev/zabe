@@ -5,6 +5,11 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
+            path: '/',
+            name: 'loading',
+            component: () => import('@/app/views/Loading.vue')
+        },
+        {
             path: '/dashboard',
             component: LayContent,
             children: [
@@ -16,11 +21,7 @@ const router = createRouter({
                 }
             ]
         },
-        {
-            path: '/',
-            name: 'loading',
-            component: () => import('@/app/views/Loading.vue')
-        },
+
         {
             path: '/notfound',
             name: 'notfound',

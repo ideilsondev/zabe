@@ -17,8 +17,6 @@
 
 <script setup>
     import { supabase } from '@/app/services/supabase';
-    import Button from 'primevue/button';
-    import ProgressSpinner from 'primevue/progressspinner';
     import { onMounted, ref } from 'vue';
     import { useRouter } from 'vue-router';
 

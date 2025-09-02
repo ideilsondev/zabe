@@ -6,6 +6,7 @@ coverage
 .cache
 .output
 .env.production
+.env.development
 .env
 dist
 .DS_Store
